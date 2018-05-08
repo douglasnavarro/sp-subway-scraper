@@ -11,11 +11,7 @@ lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira']
 
 
-file_handler = logging.FileHandler('log.txt', mode='a')
 logger = logging.getLogger(__name__)
-file_formatter = logging.Formatter(fmt='[%(asctime)s] [%(levelname)-4s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-file_handler.setFormatter(file_formatter)
-logger.addHandler(file_handler)
 logging.basicConfig(level=logging.DEBUG)
 logger.info('Starting scraper')
 
