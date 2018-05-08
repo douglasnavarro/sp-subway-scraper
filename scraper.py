@@ -32,6 +32,7 @@ def init_sheet():
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_x509_cert_url": os.environ.get('CLIENT_x509_CERT_URL', None)
         }
+    logger.info(str(headers))
     creds = ServiceAccountCredentials.from_json_keyfile_dict(headers, scope)
     #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
