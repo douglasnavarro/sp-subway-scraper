@@ -5,11 +5,11 @@ The sheet can be viewed (and freely used for any datascience project) (https://d
 
 ## How it works
 
-Every 5 minutes the script fetches (http://www.viaquatro.com.br/)[this page] using 'requests' module and extracts the operation status as shown in the column on the right-side of the page using 'beautiful soup' module. The last-update time shown is also stored and later on is associated with each subwat line.
+Every 5 minutes the script fetches [this page](http://www.viaquatro.com.br/) using 'requests' module and extracts the operation status as shown in the column on the right-side of the page using 'beautiful soup' module. The last-update time shown is also stored and later on is associated with each subwat line.
 
 Once everything is properly parsed, the information is stored in the worksheet using the 'gspread' module.
 
-The script runs indefinately on (www.heroku.com)[heroku].
+The script runs indefinately on [heroku](www.heroku.com).
 
 ## Unkown variables:
 
