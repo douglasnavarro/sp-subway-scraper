@@ -1,7 +1,7 @@
 ## What it is
 ### This project consists of basically a single python script to write the status of the São Paulo subway lines to a docs.google worksheet.
 
-The sheet can be viewed (and freely used for any datascience project) (https://docs.google.com/spreadsheets/d/19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg/edit?usp=sharing)[here].
+The sheet can be viewed (and freely used for any datascience project) [here](https://docs.google.com/spreadsheets/d/19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg/edit?usp=sharing).
 
 ## How it works
 
