@@ -115,7 +115,7 @@ while(True):
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
-    if("normal" in op_status):
+    if("normal" in op_status.values()):
         debug_sheet = client.open_by_key(SPREADSHEET_ID).worksheet('debug')
         debug_sheet.append_row(times['line4'], vq_home)
 
