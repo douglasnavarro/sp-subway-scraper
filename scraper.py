@@ -111,7 +111,7 @@ while(True):
         vq_home = None
         continue
 
-    data_sheet, debug_sheet = init_sheets()
+    data_sheet = init_sheet()
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
