@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 logger.info('Starting scraper')
 
-def init_sheet():
+def init_sheets():
     SPREADSHEET_ID = "19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg"
     # use creds to create a client to interact with the Google Drive API
     scope = ['https://spreadsheets.google.com/feeds',
@@ -36,8 +36,9 @@ def init_sheet():
     creds = ServiceAccountCredentials.from_json_keyfile_dict(headers, scope)
     #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
-    sheet = client.open_by_key(SPREADSHEET_ID).worksheet("data")
-    return sheet
+    data_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("data")
+    debug_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("debug")
+    return data_sheet, debug_sheet
 
 def get_operation_status(soup):
 
@@ -96,7 +97,6 @@ def get_time_data(soup):
         
     return {'line4':line4, 'metro':metro, 'cptm':cptm}
 
-sheet = init_sheet()
 
 while(True):
 
@@ -111,12 +111,11 @@ while(True):
         vq_home = None
         continue
 
-    
+    data_sheet, debug_sheet = init_sheets()
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
     if("normal" in op_status.values()):
-        debug_sheet = client.open_by_key(SPREADSHEET_ID).worksheet('debug')
         debug_sheet.append_row(times['line4'], vq_home)
 
 
@@ -131,11 +130,11 @@ while(True):
 
     for line in lines_metro:
         if(line == 'amarela'):
-            sheet.append_row([times['line4'], line, op_status[line]])
+            data_sheet.append_row([times['line4'], line, op_status[line]])
         else:
-            sheet.append_row([times['metro'], line, op_status[line]])
+            data_sheet.append_row([times['metro'], line, op_status[line]])
     for line in lines_cptm:
-        sheet.append_row([times['cptm'], line, op_status[line]])
+        data_sheet.append_row([times['cptm'], line, op_status[line]])
 
     logger.info('Sleeping for 300 seconds')
     time.sleep(300)
