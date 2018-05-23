@@ -5,7 +5,6 @@ import time
 import logging
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from apiclient.http import MediaFileUpload
 import os
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
