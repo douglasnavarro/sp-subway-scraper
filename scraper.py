@@ -115,13 +115,6 @@ while(True):
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
-    if("normal" in op_status.values()):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.ehlo()
-        server.starttls()
-        server.login(os.environ.get('EMAIL', None), os.environ.get('PASSWORD', None))
-        msg = "\n" + vq_home
-        server.sendmail(os.environ.get('EMAIL'), os.environ.get('EMAIL'), msg)
 
 
     # with open('data.txt', 'a') as d:
