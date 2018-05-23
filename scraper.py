@@ -5,6 +5,7 @@ import time
 import logging
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from apiclient.http import MediaFileUpload
 import os
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
@@ -115,6 +116,10 @@ while(True):
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
+    if("normal" in op_status):
+        debug_sheet = client.open_by_key(SPREADSHEET_ID).worksheet('debug')
+        debug_sheet.append_row(times['line4'], vq_home)
+
 
     # with open('data.txt', 'a') as d:
     #     for line in lines_metro:
