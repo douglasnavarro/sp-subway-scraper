@@ -5,6 +5,7 @@ import time
 import logging
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import smtplib
 import os
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 logger.info('Starting scraper')
 
-def init_sheets():
+def init_sheet():
     SPREADSHEET_ID = "19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg"
     # use creds to create a client to interact with the Google Drive API
     scope = ['https://spreadsheets.google.com/feeds',
@@ -37,8 +38,7 @@ def init_sheets():
     #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
     data_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("data")
-    debug_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("debug")
-    return data_sheet, debug_sheet
+    return data_sheet
 
 def get_operation_status(soup):
 
@@ -116,7 +116,10 @@ while(True):
     times = get_time_data(s)
     op_status = get_operation_status(s)
     if("normal" in op_status.values()):
-        debug_sheet.append_row(times['line4'], vq_home)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.login(os.environ.get('EMAIL', None), os.environ.get('PASSWORD', None))
+        msg = "\n" + vq_home
+        server.sendmail(os.environ.get('EMAIL'), os.environ.get('EMAIL'), msg)
 
 
     # with open('data.txt', 'a') as d:
