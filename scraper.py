@@ -117,6 +117,7 @@ while(True):
     for status in op_status.values():
         if(len(status) > 6 or status == ""):
             send_email(vq_home)
+            break
 
     for line in lines_metro:
         if(line == 'amarela'):
