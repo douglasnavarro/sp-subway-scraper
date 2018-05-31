@@ -115,7 +115,7 @@ while(True):
     times = get_time_data(s)
     op_status = get_operation_status(s)
     for status in op_status.values():
-        if(len(status) < 6 or status == ""):
+        if(len(status) > 6 or status == ""):
             send_email(vq_home)
 
     for line in lines_metro:
