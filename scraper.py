@@ -6,7 +6,7 @@ import logging
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
-from email import send_email as send_email
+from email_debug import send_email as send_email
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira']
