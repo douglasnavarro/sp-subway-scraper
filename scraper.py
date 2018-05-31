@@ -5,8 +5,8 @@ import time
 import logging
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import smtplib
 import os
+from email import send_email as send_email
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira']
@@ -97,29 +97,6 @@ def get_time_data(soup):
         
     return {'line4':line4, 'metro':metro, 'cptm':cptm}
 
-
-def send_email(body):
-
-    fromaddr = 'sp.subway.scraper@gmail.com'
-    username = fromaddr
-    password = 'Asimovs04!'
-    toaddr  = 'douglasnavarro94@gmail.com'
-
-    msg = "\r\n".join([
-    "From: sp.subway.scraper@gmail.com",
-    "To: douglasnavarro94@gmail.com",
-    "Subject: sp-subway-scraper-debug",
-    "",
-    body
-    ])
-
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.starttls()
-    server.login(username,password)
-    server.sendmail(fromaddr, toaddr, msg)
-    server.quit()
-
-
 while(True):
 
     try:
@@ -137,8 +114,9 @@ while(True):
     s = BeautifulSoup(vq_home, 'html.parser')
     times = get_time_data(s)
     op_status = get_operation_status(s)
-    if("normal") in op_status.values():
-        send_email(vq_home)
+    for status in op_status.values():
+        if(len(status) < 6 or status == ""):
+            send_email(vq_home)
 
     for line in lines_metro:
         if(line == 'amarela'):
