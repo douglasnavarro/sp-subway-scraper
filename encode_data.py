@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
@@ -53,32 +54,39 @@ def uprint(*objects, sep=' ', end='\n', file=sys.stdout):
         f = lambda obj: str(obj).encode(enc, errors='backslashreplace').decode(enc)
         print(*map(f, objects), sep=sep, end=end, file=file)
 
+def export_text_files(data_sheet, initial_row, final_row):
+
+    with open('inputs.txt', 'w') as inputs_file:
+            with open('outputs.txt', 'w') as outputs_file:
+
+                times = data_sheet.col_values(1)
+                lines = data_sheet.col_values(2)
+                states = data_sheet.col_values(3)
+
+                inputs_file.write('ano mes dia dia_sem hora minuto linha\n')
+                outputs_file.write('estado\n')
+
+                for row in range(initial_row - 1 , final_row):
+                    time = times[row]
+                    line = lines[row]
+                    stat = states[row]
+
+                    time = datetime.strptime(time, '%d/%m/%Y %H:%M')
+                    line = encode_line(line)
+                    try:
+                        stat = encode_status(stat)
+                    except:
+                        uprint(u"Unknown status ({}) detected in row {}. Skipping...".format(stat, row))
+                        continue
+                    
+                    #print('writing row {}'.format(row))
+                    inputs_file.write(" ".join(( str(time.year), str(time.month), str(time.day), str(time.weekday()), str(time.hour), str(time.minute), line)) + '\n')
+                    outputs_file.write(stat + '\n')
+
 def main():
 
     data_sheet = init_sheet(SPREADSHEET_ID)
     last_row = data_sheet.row_count
-
-    with open('processed_data.txt', 'w') as file:
-
-        times = data_sheet.col_values(1)
-        lines = data_sheet.col_values(2)
-        states = data_sheet.col_values(3)
-
-        file.write('ano mes dia dia_sem hora minuto linha estado\n')
-        for row in range(0, last_row):
-            time = times[row]
-            line = lines[row]
-            stat = states[row]
-
-            time = datetime.strptime(time, '%d/%m/%Y %H:%M')
-            line = encode_line(line)
-            try:
-                stat = encode_status(stat)
-            except:
-                uprint(u"Unknown status ({}) detected in row {}. Skipping...".format(stat, row))
-                continue
-            
-            #print('writing row {}'.format(row))
-            file.write(" ".join(( str(time.year), str(time.month), str(time.day), str(time.weekday()), str(time.hour), str(time.minute), line, stat)) + '\n')
+    export_text_files(data_sheet, 1, last_row)
 
 main()
