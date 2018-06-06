@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger.info('Starting scraper')
 
 def init_sheet():
-    SPREADSHEET_ID = "19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg"
+    SPREADSHEET_ID = "1kB5Duyiaoc1uhTJv47KN1f7b8kkgT2pCyy-_dcs1DXE"
     # use creds to create a client to interact with the Google Drive API
     scope = ['https://spreadsheets.google.com/feeds',
             'https://www.googleapis.com/auth/drive']
