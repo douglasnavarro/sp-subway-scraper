@@ -4,7 +4,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import sys
 
-SPREADSHEET_ID = "19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg"
+SPREADSHEET_ID_MAY = "19vBtt1j64Au01vJaVjyiNB5CiCqSlG7juUc6_VSALbg"
+SPREADSHEET_ID_JUNE = "1kB5Duyiaoc1uhTJv47KN1f7b8kkgT2pCyy-_dcs1DXE"
 
 def init_sheet(SPREADSHEET_ID):
 
@@ -54,10 +55,10 @@ def uprint(*objects, sep=' ', end='\n', file=sys.stdout):
         f = lambda obj: str(obj).encode(enc, errors='backslashreplace').decode(enc)
         print(*map(f, objects), sep=sep, end=end, file=file)
 
-def export_text_files(data_sheet, initial_row, final_row):
+def export_text_files(data_sheet, initial_row, final_row, line_filter, day_filter):
 
-    with open('inputs.txt', 'w') as inputs_file:
-            with open('outputs.txt', 'w') as outputs_file:
+    with open('.\\encoded_data\\inputs_{}_may_{}.txt'.format(day_filter, line_filter), 'w') as inputs_file:
+            with open('.\\encoded_data\\outputs_{}_may_{}.txt'.format(day_filter, line_filter), 'w') as outputs_file:
 
                 times = data_sheet.col_values(1)
                 lines = data_sheet.col_values(2)
@@ -72,7 +73,8 @@ def export_text_files(data_sheet, initial_row, final_row):
                     stat = states[row]
 
                     time = datetime.strptime(time, '%d/%m/%Y %H:%M')
-                    line = encode_line(line)
+                    enc_line = encode_line(line)
+
                     try:
                         stat = encode_status(stat)
                     except:
@@ -80,13 +82,48 @@ def export_text_files(data_sheet, initial_row, final_row):
                         continue
                     
                     #print('writing row {}'.format(row))
-                    inputs_file.write(" ".join(( str(time.year), str(time.month), str(time.day), str(time.weekday()), str(time.hour), str(time.minute), line)) + '\n')
-                    outputs_file.write(stat + '\n')
+                    print(line, line_filter)
+                    print(time.day, day_filter)
+                    if(line == line_filter and time.day == day_filter):
+                        inputs_file.write(" ".join(( str(time.year), str(time.month).zfill(2), str(time.day).zfill(2), str(time.weekday()).zfill(2), str(time.hour).zfill(2), str(time.minute).zfill(2), enc_line.zfill(2))) + '\n')
+                        outputs_file.write(stat + '\n')
+
+def export_data_simplified(data_sheet, day, line_selected):
+    with open('{}-{}-simplified.txt'.format(day, line_selected), 'w') as out_file:
+
+        times = data_sheet.col_values(1)
+        lines = data_sheet.col_values(2)
+        states = data_sheet.col_values(3)
+
+        out_file.write('horario estado\n')
+        for row in range(0, data_sheet.row_count):
+            time = times[row]
+            line = lines[row]
+            stat = states[row]
+
+            time = datetime.strptime(time, '%d/%m/%Y %H:%M')
+            
+            print(line, line_selected)
+            print(day, time.day)
+            if (line != line_selected):
+                continue
+            elif(day != time.day):
+                continue
+            
+
+            formatted_time = datetime.strftime(time, '%H:%M')
+            try:
+                stat = encode_status(stat)
+            except:
+                uprint(u"Unknown status ({}) detected in row {}. Skipping...".format(stat, row))
+                continue
+            
+            out_file.write(" ".join((formatted_time, stat)) + '\n')
 
 def main():
 
-    data_sheet = init_sheet(SPREADSHEET_ID)
+    data_sheet = init_sheet(SPREADSHEET_ID_MAY)
     last_row = data_sheet.row_count
-    export_text_files(data_sheet, 1, last_row)
+    export_text_files(data_sheet, 1, last_row, 'turquesa', 9)
 
 main()
