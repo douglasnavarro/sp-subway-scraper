@@ -11,7 +11,7 @@ Once everything is properly parsed, the information is stored in the worksheet u
 
 The script runs indefinately on [heroku](http://www.heroku.com).
 
-## Unkown variables:
+## Unknown variables:
 
 I am not sure what will be shown in the website when line 4 (yellow / amarela) status is not normal. Some pre-processing may be required, as the scraper.py script does not try to match the yellow line status with the status from the other ones. Check values for 'amarela' line.
 
