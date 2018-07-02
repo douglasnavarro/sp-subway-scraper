@@ -127,5 +127,5 @@ while(True):
     for line in lines_cptm:
         data_sheet.append_row([times['cptm'], line, op_status[line]])
 
-    logger.info('Sleeping for 300 seconds')
-    time.sleep(300)
+    logger.info('Sleeping for 360 seconds')
+    time.sleep(360)
