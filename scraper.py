@@ -8,7 +8,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 from email_debug import send_email as send_email
 
-lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
+lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilás', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira', 'jade']
 all_lines   = lines_metro + lines_cptm
 
@@ -64,8 +64,8 @@ def get_operation_status(soup):
             line_title = spans[0].text.lower()
             line_status = spans[1].text.lower()
             # now that we have line_title and line_status set, we only have to store it to return later
-            print("extracted {} = {}".format(line_title, line_status))
             extracted_status[line_title] = line_status
+        logging.info('Extracted: {}'.format(extracted_status))
 
     return(extracted_status)
 
