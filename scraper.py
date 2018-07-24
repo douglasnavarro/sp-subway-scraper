@@ -95,7 +95,7 @@ while(True):
             send_email(vq_home)
             break
 
-    for line in lines_metro:
+    for line in all_lines:
         data_sheet.append_row([time_data, line, op_status[line]])
 
     logger.info('Sleeping for 360 seconds')
