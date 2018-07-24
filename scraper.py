@@ -88,7 +88,7 @@ while(True):
 
     data_sheet = init_sheet()
     s = BeautifulSoup(vq_home, 'html.parser')
-    time = get_time_data(s)
+    time_data = get_time_data(s)
     op_status = get_operation_status(s)
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
@@ -96,7 +96,7 @@ while(True):
             break
 
     for line in lines_metro:
-        data_sheet.append_row([time, line, op_status[line]])
+        data_sheet.append_row([time_data, line, op_status[line]])
 
     logger.info('Sleeping for 360 seconds')
     time.sleep(360)
