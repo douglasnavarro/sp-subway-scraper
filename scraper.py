@@ -9,7 +9,8 @@ import os
 from email_debug import send_email as send_email
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilas', 'prata']
-lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira']
+lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira', 'jade']
+all_lines   = lines_metro + lines_cptm
 
 
 logger = logging.getLogger(__name__)
@@ -42,60 +43,35 @@ def init_sheet():
 
 def get_operation_status(soup):
 
-    status = {
-    'azul': '',
-    'verde': '',
-    'vermelha': '',
-    'amarela': '',
-    'lilás': '',
-    'rubi': '',
-    'diamante': '',
-    'esmeralda': '',
-    'turquesa': '',
-    'coral': '',
-    'safira': '',
-    'prata': ''
-    }
+    extracted_status = {line:'' for line in all_lines}
 
-    status_amarela = soup.find('img', id="imageCurrentLineFourStatus")['alt']
-    if(status_amarela == 'Operação Normal'):
-        status_amarela = 'normal'
-    status['amarela'] = status_amarela
-    # if('normal' in status_amarela):
-    #     status_amarela = 'normal'
-    # elif('reduzida' in status_amarela):
-    #     status_amarela = 'velocidade reduzida'
-    # else:
-    #     status_amarela = 'interrompida'
+    # Contains all the info we need
+    status_column = soup.find(class_="operacao")
 
-    stations = soup.find_all('div', class_='estacao')
-    for station in stations:
-        name_and_status = station.find_all('span')
-        if(len(name_and_status) == 2):
-            name = name_and_status[0].text.lower()
-            station_status = name_and_status[1].text.lower()
-            status[name] = station_status
-    status['lilas'] = status['lilás']
-    del status['lilás']
-    return(status)
+    # The 'amarela' line is shown in a special container
+    extracted_status['amarela'] = status_column.find(class_="status").text
+
+    # All of the other lines are shown in a more orderly fashion. Metro has a div and CPTM has another one
+    lines_containers  = status_column.find_all(class_="linhas")
+
+    for container in lines_containers:
+        line_info_divs = container.find_all(class_="info")
+        # each info div has two span tags inside: one for line title and one for line status
+        for div in line_info_divs:
+            line_title  = ''
+            line_status = ''
+            spans = div.find_all("span")
+            line_title = spans[0].text.lower()
+            line_status = spans[1].text.lower()
+            # now that we have line_title and line_status set, we only have to store it to return later
+            print("extracted {} = {}".format(line_title, line_status))
+            extracted_status[line_title] = line_status
+
+    return(extracted_status)
 
 def get_time_data(soup):
-    div_list = soup.findAll('div', class_='titulo-operacao')
 
-    for div in div_list:
-        h3 = div.find('h3').text
-        if(h3 == 'Operação'):
-            line4 = div.find('time').text
-        elif(h3 == 'Metrô de São Paulo'):
-            metro = div.find('time').text
-        elif(h3 == 'CPTM'):
-            cptm = div.find('time').text
-    
-    line4 = re.search(r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}',line4).group()
-    metro = re.search(r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}',metro).group()
-    cptm = re.search(r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}',cptm).group()
-        
-    return {'line4':line4, 'metro':metro, 'cptm':cptm}
+    return soup.find('time').text
 
 while(True):
 
@@ -112,7 +88,7 @@ while(True):
 
     data_sheet = init_sheet()
     s = BeautifulSoup(vq_home, 'html.parser')
-    times = get_time_data(s)
+    time = get_time_data(s)
     op_status = get_operation_status(s)
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
@@ -120,12 +96,7 @@ while(True):
             break
 
     for line in lines_metro:
-        if(line == 'amarela'):
-            data_sheet.append_row([times['line4'], line, op_status[line]])
-        else:
-            data_sheet.append_row([times['metro'], line, op_status[line]])
-    for line in lines_cptm:
-        data_sheet.append_row([times['cptm'], line, op_status[line]])
+        data_sheet.append_row([time, line, op_status[line]])
 
     logger.info('Sleeping for 360 seconds')
     time.sleep(360)
