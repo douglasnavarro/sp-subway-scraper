@@ -7,18 +7,29 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 from email_debug import send_email as send_email
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilás', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira', 'jade']
 all_lines   = lines_metro + lines_cptm
 
+SPREADSHEET_ID = "1WiKE6SUCqAaUF9qOJOg_tMeOSA_lm_kjm83qwXF9dSg"
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 logger.info('Starting scraper')
 
-def init_sheet():
-    SPREADSHEET_ID = "1WiKE6SUCqAaUF9qOJOg_tMeOSA_lm_kjm83qwXF9dSg"
+def get_page_html(url):
+    try:
+        page = requests.get(url)
+        if page.status_code == 200:
+            return page.text
+        else:
+            return None
+    except:
+        return None
+
+def init_sheet(SPREADSHEET_ID):
     # use creds to create a client to interact with the Google Drive API
     scope = ['https://spreadsheets.google.com/feeds',
             'https://www.googleapis.com/auth/drive']
@@ -41,7 +52,7 @@ def init_sheet():
     data_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("data")
     return data_sheet
 
-def get_operation_status(soup):
+def get_operation_status(soup, all_lines):
 
     extracted_status = {line:'' for line in all_lines}
 
@@ -73,30 +84,28 @@ def get_time_data(soup):
 
     return soup.find('time').text
 
-while(True):
-
-    try:
-        vq_home = requests.get('http://www.viaquatro.com.br/')
-        if(vq_home.status_code == 200):
-            vq_home = vq_home.text
-        else:
-            vq_home = None
-            continue
-    except:
-        vq_home = None
-        continue
-
-    data_sheet = init_sheet()
-    s = BeautifulSoup(vq_home, 'html.parser')
-    time_data = get_time_data(s)
-    op_status = get_operation_status(s)
+def check_data(op_status):
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
             send_email(vq_home)
             break
 
+sched = BlockingScheduler()
+args = [SPREADSHEET_ID, all_lines]
+@sched.scheduled_job('interval', minutes=1, args=args)
+def timed_job(SPREADSHEET_ID, all_lines):
+    vq_home = get_page_html('http://www.viaquatro.com.br')
+    if vq_home is None:
+        return
+
+    s = BeautifulSoup(vq_home, 'html.parser')
+    time_data = get_time_data(s)
+    op_status = get_operation_status(s, all_lines)
+
+    data_sheet = init_sheet(SPREADSHEET_ID)
+    check_data(op_status)
+
     for line in all_lines:
         data_sheet.append_row([time_data, line, op_status[line]])
 
-    logger.info('Sleeping for 360 seconds')
-    time.sleep(360)
+sched.start()
