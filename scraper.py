@@ -92,7 +92,7 @@ def check_data(op_status):
 
 sched = BlockingScheduler()
 args = [SPREADSHEET_ID, all_lines]
-@sched.scheduled_job('interval', minutes=1, args=args)
+@sched.scheduled_job('interval', minutes=6, args=args)
 def timed_job(SPREADSHEET_ID, all_lines):
     vq_home = get_page_html('http://www.viaquatro.com.br')
     if vq_home is None:
