@@ -84,7 +84,7 @@ def get_time_data(soup):
 
     return soup.find('time').text
 
-def check_data(op_status):
+def check_data(op_status, page):
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
             send_email(vq_home)
@@ -103,7 +103,7 @@ def timed_job(SPREADSHEET_ID, all_lines):
     op_status = get_operation_status(s, all_lines)
 
     data_sheet = init_sheet(SPREADSHEET_ID)
-    check_data(op_status)
+    check_data(op_status, vq_home)
 
     for line in all_lines:
         data_sheet.append_row([time_data, line, op_status[line]])
