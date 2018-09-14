@@ -87,7 +87,7 @@ def get_time_data(soup):
 def check_data(op_status, page):
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
-            send_email(vq_home)
+            send_email(page)
             break
 
 sched = BlockingScheduler()
