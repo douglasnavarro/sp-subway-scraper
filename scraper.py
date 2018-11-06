@@ -13,7 +13,7 @@ lines_metro = ['azul', 'verde', 'vermelha', 'amarela', 'lilás', 'prata']
 lines_cptm  = ['rubi', 'diamante', 'esmeralda', 'turquesa', 'coral', 'safira', 'jade']
 all_lines   = lines_metro + lines_cptm
 
-SPREADSHEET_ID = "1u6W2vq8pXjWKTWP8stww1aHjGxrsbxS8KPjQwXOzKW0"
+SPREADSHEET_ID = "12mzoEpbjmDFVJnzfjyK1YOBRSWO8e2XChHANEWJMQFo"
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
