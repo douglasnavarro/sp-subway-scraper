@@ -105,7 +105,7 @@ def check_data(op_status, page):
 
 
 sched = BlockingScheduler()
-args = [SPREADSHEET_ID, all_lines]
+args = [SPREADSHEET_ID, ALL_LINES]
 
 
 @sched.scheduled_job('interval', minutes=6, args=args)
