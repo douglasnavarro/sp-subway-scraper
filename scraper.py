@@ -55,13 +55,13 @@ def init_sheet(SPREADSHEET_ID):
     }
     # logger.info(str(headers))
     creds = ServiceAccountCredentials.from_json_keyfile_dict(headers, scope)
-    #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+    # creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
     data_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("data")
     return data_sheet
 
 
-def get_operation_status_via_quatro(soup, all_lines):
+def get_operation_status(soup, all_lines):
 
     extracted_status = {line: '' for line in all_lines}
 
@@ -92,12 +92,8 @@ def get_operation_status_via_quatro(soup, all_lines):
 
     return(extracted_status)
 
-def get_operation_status_metro(soup, all_lines):
-
-
 
 def get_time_data(soup):
-
     return soup.find('time').text
 
 
@@ -111,8 +107,9 @@ sched = BlockingScheduler()
 args = [SPREADSHEET_ID, ALL_LINES]
 
 
-@sched.scheduled_job('interval', minutes=6, args=args)
+@sched.scheduled_job('interval', seconds=1, args=args)
 def timed_job(SPREADSHEET_ID, all_lines):
+    missing_data = False
     for _ in range(3):
         vq_home = get_page_html('http://www.viaquatro.com.br')
         if vq_home is None:
@@ -126,11 +123,15 @@ def timed_job(SPREADSHEET_ID, all_lines):
         data_sheet = init_sheet(SPREADSHEET_ID)
         if check_data(op_status, vq_home):
             logger.info('not all data was gathered from html. trying again in 10 seconds.')
+            missing_data = True
             time.sleep(10)
             continue
         else:
+            missing_data = False
             break
 
+    if missing_data:
+        send_email(vq_home)
     for line in all_lines:
         data_sheet.append_row([time_data, line, op_status[line]])
 
