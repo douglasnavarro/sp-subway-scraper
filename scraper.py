@@ -121,7 +121,7 @@ def timed_job(SPREADSHEET_ID, all_lines):
         op_status = get_operation_status(s, all_lines)
 
         data_sheet = init_sheet(SPREADSHEET_ID)
-        if check_data(op_status, vq_home):
+        if check_data_missing(op_status, vq_home):
             logger.info('not all data was gathered from html. trying again in 10 seconds.')
             missing_data = True
             time.sleep(10)
