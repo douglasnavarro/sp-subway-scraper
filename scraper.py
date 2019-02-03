@@ -1,6 +1,7 @@
 import logging
 import os
 import requests
+import time
 from bs4 import BeautifulSoup
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -18,7 +19,7 @@ LINES_CPTM = [
     'jade']
 ALL_LINES = LINES_METRO + LINES_CPTM
 
-SPREADSHEET_ID = "1OnDkKFvaVPaRGRUURK6KXla0AIQnpDj-wEBx4rPntP0"
+SPREADSHEET_ID = "1P8X-3Q8iJbBTP0-8sNlR9WY5WpZkeh2kzhlUhWAFrBg"
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -60,7 +61,7 @@ def init_sheet(SPREADSHEET_ID):
     return data_sheet
 
 
-def get_operation_status(soup, all_lines):
+def get_operation_status_via_quatro(soup, all_lines):
 
     extracted_status = {line: '' for line in all_lines}
 
@@ -91,17 +92,19 @@ def get_operation_status(soup, all_lines):
 
     return(extracted_status)
 
+def get_operation_status_metro(soup, all_lines):
+
+
 
 def get_time_data(soup):
 
     return soup.find('time').text
 
 
-def check_data(op_status, page):
+def check_data_missing(op_status, page):
     for status in op_status.values():
         if(len(status) < 6 or status == ""):
-            send_email(page)
-            break
+            return True
 
 
 sched = BlockingScheduler()
@@ -110,16 +113,23 @@ args = [SPREADSHEET_ID, ALL_LINES]
 
 @sched.scheduled_job('interval', minutes=6, args=args)
 def timed_job(SPREADSHEET_ID, all_lines):
-    vq_home = get_page_html('http://www.viaquatro.com.br')
-    if vq_home is None:
-        return
+    for _ in range(3):
+        vq_home = get_page_html('http://www.viaquatro.com.br')
+        if vq_home is None:
+            logger.error('failed getting via quatro page.')
+            return
 
-    s = BeautifulSoup(vq_home, 'html.parser')
-    time_data = get_time_data(s)
-    op_status = get_operation_status(s, all_lines)
+        s = BeautifulSoup(vq_home, 'html.parser')
+        time_data = get_time_data(s)
+        op_status = get_operation_status(s, all_lines)
 
-    data_sheet = init_sheet(SPREADSHEET_ID)
-    check_data(op_status, vq_home)
+        data_sheet = init_sheet(SPREADSHEET_ID)
+        if check_data(op_status, vq_home):
+            logger.info('not all data was gathered from html. trying again in 10 seconds.')
+            time.sleep(10)
+            continue
+        else:
+            break
 
     for line in all_lines:
         data_sheet.append_row([time_data, line, op_status[line]])
