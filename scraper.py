@@ -2,6 +2,7 @@ import logging
 import os
 import requests
 import time
+import datetime
 from bs4 import BeautifulSoup
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -19,7 +20,18 @@ LINES_CPTM = [
     'jade']
 ALL_LINES = LINES_METRO + LINES_CPTM
 
-SPREADSHEET_ID = "1P8X-3Q8iJbBTP0-8sNlR9WY5WpZkeh2kzhlUhWAFrBg"
+SPREADSHEET_IDS = {
+    3: "1ztkigfIRa_zV8wtrBeKLDleeevSFMSj9ExUorxSjYnQ",
+    4: "1i8UzOzQuUwzHSc8uo0P2gmrBVkSouLScwkyyZ8SYp54",
+    5: "1Q7O7DpVuhU11a8WTQrftCDTdjIxj5LnMGQiDCp-gVOc",
+    6: "11EXBGvjpsZEfumKcw8s_UxyERw15MA0xOos2mn4cWHc",
+    7: "16RkW-vMi2JJoWQilE_eh989s39ZC5BMQ22l1Z-p4ZXQ",
+    8: "1ZCFSglQm4WoeROW_JXAcDUkJER8vkBFuJMBFcW3L4eQ",
+    9: "1iTD8mv3R1ryP5dGAiDnW3qtZItbka021Mij79NstFXM",
+    10: "1ermEWImjrNsw9cBHEQIKppO09DrN_dlgDVNlLCP85qg",
+    11: "124IC2_6sCHgVM7VV7bul_3KSIGu7sZW4AI9cvv2FXtI",
+    12: "1tIVjV5Uw4QHT0Fm4RTnVmUC36zahnkJrko6wIKTxi08"
+}
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -103,12 +115,17 @@ def check_data_missing(op_status, page):
             return True
 
 
+def sheet_id_from_date(date, spreadsheet_ids):
+    datetime_obj = datetime.datetime.strptime(date, '%d/%m/%Y %H:%M')
+    logger.info('using sheet id for month {}'.format(datetime_obj.month))
+    return spreadsheet_ids[datetime_obj.month]
+
 sched = BlockingScheduler()
-args = [SPREADSHEET_ID, ALL_LINES]
+args = [SPREADSHEET_IDS, ALL_LINES]
 
 
-@sched.scheduled_job('interval', minutes=6, args=args)
-def timed_job(SPREADSHEET_ID, all_lines):
+@sched.scheduled_job('interval', seconds=1, args=args)
+def timed_job(SPREADSHEET_IDS, all_lines):
     missing_data = False
     for _ in range(3):
         vq_home = get_page_html('http://www.viaquatro.com.br')
@@ -120,7 +137,6 @@ def timed_job(SPREADSHEET_ID, all_lines):
         time_data = get_time_data(s)
         op_status = get_operation_status(s, all_lines)
 
-        data_sheet = init_sheet(SPREADSHEET_ID)
         if check_data_missing(op_status, vq_home):
             logger.info('not all data was gathered from html. trying again in 10 seconds.')
             missing_data = True
@@ -130,6 +146,8 @@ def timed_job(SPREADSHEET_ID, all_lines):
             missing_data = False
             break
 
+    sheet_id = sheet_id_from_date(time_data, SPREADSHEET_IDS)
+    data_sheet = init_sheet(sheet_id)
     if missing_data:
         send_email(vq_home)
     for line in all_lines:
