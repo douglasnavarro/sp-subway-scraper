@@ -124,7 +124,7 @@ sched = BlockingScheduler()
 args = [SPREADSHEET_IDS, ALL_LINES]
 
 
-@sched.scheduled_job('interval', seconds=1, args=args)
+@sched.scheduled_job('interval', minutes=6, args=args)
 def timed_job(SPREADSHEET_IDS, all_lines):
     missing_data = False
     for _ in range(3):
