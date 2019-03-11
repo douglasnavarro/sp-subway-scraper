@@ -15,4 +15,8 @@ The script runs indefinately on [heroku](http://www.heroku.com).
 
 If for some reason the data points registered are empty, an e-mail is sent with the page attached so I can see the page and if necessary the logs to find out what happend.
 
-## If this data is ever useful to you, let me know. Enjoy! 🍻
+**If this data is ever useful to you, let me know. Enjoy!**
+🍻
+
+## Data Analysis
+An analysis of the data was made by [Paulo](https://github.com/pmhaddad)! You can read it [here](https://github.com/pmhaddad/ds_subway_analysis/blob/master/subway_analysis.md)
