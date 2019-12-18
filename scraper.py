@@ -21,15 +21,9 @@ LINES_CPTM = [
 ALL_LINES = LINES_METRO + LINES_CPTM
 
 SPREADSHEET_IDS = {
-    3: "1ztkigfIRa_zV8wtrBeKLDleeevSFMSj9ExUorxSjYnQ",
-    4: "1i8UzOzQuUwzHSc8uo0P2gmrBVkSouLScwkyyZ8SYp54",
-    5: "1Q7O7DpVuhU11a8WTQrftCDTdjIxj5LnMGQiDCp-gVOc",
-    6: "11EXBGvjpsZEfumKcw8s_UxyERw15MA0xOos2mn4cWHc",
-    7: "16RkW-vMi2JJoWQilE_eh989s39ZC5BMQ22l1Z-p4ZXQ",
-    8: "1ZCFSglQm4WoeROW_JXAcDUkJER8vkBFuJMBFcW3L4eQ",
-    9: "1iTD8mv3R1ryP5dGAiDnW3qtZItbka021Mij79NstFXM",
-    10: "1ermEWImjrNsw9cBHEQIKppO09DrN_dlgDVNlLCP85qg",
-    11: "124IC2_6sCHgVM7VV7bul_3KSIGu7sZW4AI9cvv2FXtI",
+    1: "17TRsvuMKbX3fC4tCgac0HAyuRHaXKUxwpUO-0pKG0mY",
+    2: "1pkkC_4g7WArWfBt91r6jzZlsLeuiRGAuKTV2ggUnuU0",
+    3: "15QZfZZ4oVvZqfPHThHDrRq9O3_ax9io8D3f-xXPd3GY",
     12: "1tIVjV5Uw4QHT0Fm4RTnVmUC36zahnkJrko6wIKTxi08"
 }
 
