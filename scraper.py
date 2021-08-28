@@ -114,6 +114,7 @@ def sheet_id_from_date(date, spreadsheet_ids):
     logger.info('using sheet id for month {}'.format(datetime_obj.month))
     return spreadsheet_ids[datetime_obj.month]
 
+
 sched = BlockingScheduler()
 args = [SPREADSHEET_IDS, ALL_LINES]
 
@@ -132,7 +133,8 @@ def timed_job(SPREADSHEET_IDS, all_lines):
         op_status = get_operation_status(s, all_lines)
 
         if check_data_missing(op_status, vq_home):
-            logger.info('not all data was gathered from html. trying again in 10 seconds.')
+            logger.info(
+                'not all data was gathered from html. trying again in 10 seconds.')
             missing_data = True
             time.sleep(10)
             continue
